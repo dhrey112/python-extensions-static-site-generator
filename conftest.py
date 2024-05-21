@@ -32,7 +32,7 @@ class Parser:
 
         if file_name is not None:
             path = lambda root, fn: root / "{}.py".format(fn)
-            if file_name == "menu" or file_name == "stats":
+            if file_name in ["menu", "stats"]:
                 full_path = path(ext, file_name)
             elif file_name == "ssg":
                 full_path = path(Path.cwd(), file_name)
@@ -94,13 +94,12 @@ class Parser:
 
     def execute(self, expr):
         result = Tree(self.nodes).execute(expr)
-        if isinstance(result, (generator, chain, map)):
-            process = list(result)
-            return (
-                Parser(None, process[0]) if len(process) == 1 else Parser(None, process)
-            )
-        else:
+        if not isinstance(result, (generator, chain, map)):
             return Parser(None, result)
+        process = list(result)
+        return (
+            Parser(None, process[0]) if len(process) == 1 else Parser(None, process)
+        )
 
     ex = execute
 
